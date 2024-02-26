@@ -1,0 +1,11 @@
+[package]
+name = "iro-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.80"
+clap = "4.5.1"
+image = "0.24.9"
+iro = { path = "../lib" }
+serde_yaml = "0.9.32"
