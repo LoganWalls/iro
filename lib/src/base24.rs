@@ -1,7 +1,6 @@
 use anyhow::{Context, Result};
 use itertools::{Either, Itertools};
-use palette::convert::FromColorUnclamped;
-use palette::{Clamp, IntoColor, LinSrgb, Okhsv, Oklab, Oklch, Srgb};
+use palette::{IntoColor, Oklch, Srgb};
 use serde::ser::SerializeMap;
 use serde::{Serialize, Serializer};
 
@@ -24,11 +23,6 @@ where
     let mut serializer = serializer.serialize_map(Some(24))?;
 
     for (idx, color) in colors.iter().enumerate() {
-        // let okhsv: Okhsv<f64> = Okhsv::from_color_unclamped(*color).clamp();
-        // dbg!(okhsv);
-        // let oklab: Oklab<f64> = Oklab::from_color_unclamped(okhsv);
-        // dbg!(oklab);
-        // let rgb: Srgb<u8> = Srgb::from_linear(LinSrgb::from_color_unclamped(oklab));
         let rgb: Srgb<u8> = Srgb::from_linear((*color).into_color());
         let hex = format!("{0:02x}{1:02x}{2:02x}", rgb.red, rgb.green, rgb.blue);
 
