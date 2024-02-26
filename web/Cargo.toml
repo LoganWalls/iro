@@ -15,6 +15,8 @@ console_error_panic_hook = "0.1.7"
 iro = { path = "../lib" }
 base64 = "0.21.7"
 serde_yaml = "0.9.32"
+image = "0.24.9"
+anyhow = "1.0.80"
 
 [dev-dependencies]
 wasm-bindgen = "0.2"

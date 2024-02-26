@@ -1,11 +1,13 @@
 use anyhow::{Context, Result};
 use itertools::{Either, Itertools};
-use palette::{IntoColor, Oklch, Srgb};
+use palette::Oklch;
 use serde::ser::SerializeMap;
 use serde::{Serialize, Serializer};
 
 use std::mem::MaybeUninit;
 use std::{array, iter};
+
+use crate::lch_to_hex;
 
 #[derive(Serialize, Debug)]
 pub struct Base24Style {
@@ -23,10 +25,7 @@ where
     let mut serializer = serializer.serialize_map(Some(24))?;
 
     for (idx, color) in colors.iter().enumerate() {
-        let rgb: Srgb<u8> = Srgb::from_linear((*color).into_color());
-        let hex = format!("{0:02x}{1:02x}{2:02x}", rgb.red, rgb.green, rgb.blue);
-
-        serializer.serialize_entry(&format_args!("base{idx:02X}"), &hex)?;
+        serializer.serialize_entry(&format_args!("base{idx:02X}"), &lch_to_hex(color))?;
     }
 
     serializer.end()

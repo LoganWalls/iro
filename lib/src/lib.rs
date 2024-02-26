@@ -1,4 +1,5 @@
 pub mod base24;
+pub use base24::{generate_palette, Base24Style};
 
 use std::ops::Div;
 use std::path::PathBuf;
@@ -19,6 +20,11 @@ pub struct Args {
     /// Generates light color schemes when true
     #[arg(short, long, default_value_t = false)]
     pub light_mode: bool,
+}
+
+pub fn lch_to_hex(color: &Oklch<f64>) -> String {
+    let rgb: Srgb<u8> = Srgb::from_linear((*color).into_color());
+    format!("{0:02x}{1:02x}{2:02x}", rgb.red, rgb.green, rgb.blue)
 }
 
 pub fn parse_colors(image: &mut RgbImage) -> Vec<Oklch<f64>> {

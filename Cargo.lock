@@ -811,9 +811,11 @@ dependencies = [
 name = "iro-web"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "base64",
  "console_error_panic_hook",
  "console_log",
+ "image",
  "iro",
  "leptos",
  "log",
