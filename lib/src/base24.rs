@@ -56,7 +56,7 @@ pub fn generate_palette(mut colors: Vec<Oklch<f64>>, light_mode: bool) -> Result
     let (base_chroma, highlight_lightness, highlight_chroma) = if light_mode {
         (0.04, 0.4, 0.13)
     } else {
-        (0.03, 0.5, 0.12)
+        (0.03, 0.6, 0.12)
     };
 
     let base_colors = (if light_mode {
@@ -64,7 +64,7 @@ pub fn generate_palette(mut colors: Vec<Oklch<f64>>, light_mode: bool) -> Result
     } else {
         Either::Right(1..=8)
     })
-    .map(|l| Oklch::new(l as f64 * 0.1, base_chroma, base_hue));
+    .map(|l| Oklch::new(l as f64 * 0.125, base_chroma, base_hue));
 
     let mut i = 0;
     while colors.len() < 8 {

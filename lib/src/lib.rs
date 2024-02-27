@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use clap::Parser;
 use image::RgbImage;
 use itertools::Itertools;
-use palette::Oklch;
+pub use palette::Oklch;
 use palette::{cast::FromComponents, IntoColor, Srgb};
 
 /// Generate color schemes from images
@@ -70,13 +70,3 @@ pub fn parse_colors(image: &mut RgbImage) -> Vec<Oklch<f64>> {
         })
         .collect::<Vec<_>>()
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     #[test]
-//     fn it_works() {
-//         assert_eq!(1, 1);
-//     }
-// }
