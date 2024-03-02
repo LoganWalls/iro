@@ -51,20 +51,65 @@ pub fn color_array<const N: usize>(
     Some(colors.map(|color| unsafe { color.assume_init() }))
 }
 
-pub fn generate_palette(mut colors: Vec<Oklch<f64>>, light_mode: bool) -> Result<[Oklch<f64>; 24]> {
-    let base_hue = colors.first().expect("at least one color").hue;
-    let (base_chroma, highlight_lightness, highlight_chroma) = if light_mode {
-        (0.04, 0.4, 0.13)
-    } else {
-        (0.03, 0.6, 0.12)
-    };
+#[derive(Debug, Clone)]
+pub enum PaletteStyle {
+    Dark,
+    Light,
+}
 
-    let base_colors = (if light_mode {
-        Either::Left((1..=8).rev())
-    } else {
-        Either::Right(1..=8)
-    })
-    .map(|l| Oklch::new(l as f64 * 0.125, base_chroma, base_hue));
+impl Default for PaletteStyle {
+    fn default() -> Self {
+        Self::Dark
+    }
+}
+
+pub struct PaletteSettings {
+    pub style: PaletteStyle,
+    pub keep_image_colors: Option<usize>,
+}
+
+impl Default for PaletteSettings {
+    fn default() -> Self {
+        Self {
+            style: PaletteStyle::Dark,
+            keep_image_colors: Some(8),
+        }
+    }
+}
+
+pub fn generate_palette(
+    mut colors: Vec<Oklch<f64>>,
+    settings: &PaletteSettings,
+) -> Result<[Oklch<f64>; 24]> {
+    let base_hue = colors.first().expect("at least one color").hue;
+    let base_chroma;
+    let highlight_lightness;
+    let highlight_chroma;
+    let base_colors_it;
+    let base24_bg: [Oklch<f64>; 2];
+    match settings.style {
+        PaletteStyle::Dark => {
+            base_chroma = 0.03;
+            highlight_lightness = 0.6;
+            highlight_chroma = 0.12;
+            base_colors_it = Either::Right(1..=8);
+            base24_bg = [
+                Oklch::new(0.05, base_chroma, base_hue),
+                Oklch::new(0.0, base_chroma, base_hue),
+            ];
+        }
+        PaletteStyle::Light => {
+            base_chroma = 0.04;
+            highlight_lightness = 0.4;
+            highlight_chroma = 0.13;
+            base_colors_it = Either::Left((1..=8).rev());
+            base24_bg = [
+                Oklch::new(0.85, base_chroma, base_hue),
+                Oklch::new(0.90, base_chroma, base_hue),
+            ];
+        }
+    };
+    let base_colors = base_colors_it.map(|l| Oklch::new(l as f64 * 0.125, base_chroma, base_hue));
 
     let mut i = 0;
     while colors.len() < 8 {
@@ -73,6 +118,7 @@ pub fn generate_palette(mut colors: Vec<Oklch<f64>>, light_mode: bool) -> Result
     }
     let (highlights, highlights_tee) = colors
         .iter()
+        .take(settings.keep_image_colors.unwrap_or(colors.len()))
         .sorted_unstable_by(|a, b| a.chroma.partial_cmp(&b.chroma).expect("comparable chromas"))
         .rev()
         .take(8)
@@ -80,18 +126,6 @@ pub fn generate_palette(mut colors: Vec<Oklch<f64>>, light_mode: bool) -> Result
         .sorted_unstable_by_key(|hue| hue.into_positive_degrees() as u16)
         .map(|hue| Oklch::new(highlight_lightness, highlight_chroma, hue))
         .tee();
-
-    let base24_bg: [Oklch<f64>; 2] = if light_mode {
-        [
-            Oklch::new(0.85, base_chroma, base_hue),
-            Oklch::new(0.90, base_chroma, base_hue),
-        ]
-    } else {
-        [
-            Oklch::new(0.05, base_chroma, base_hue),
-            Oklch::new(0.0, base_chroma, base_hue),
-        ]
-    };
 
     let bright_highlights = highlights_tee.enumerate().filter_map(|(i, color)| {
         match i {

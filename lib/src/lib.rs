@@ -1,25 +1,20 @@
 pub mod base24;
 pub use base24::{generate_palette, Base24Style};
 
-use std::ops::Div;
-use std::path::PathBuf;
-
-use clap::Parser;
 use image::RgbImage;
 use itertools::Itertools;
 pub use palette::Oklch;
 use palette::{cast::FromComponents, IntoColor, Srgb};
+use std::ops::Div;
 
-/// Generate color schemes from images
-#[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
-pub struct Args {
-    /// Path to the image
-    pub path: PathBuf,
+pub struct ParseColorsSettings {
+    pub segment_size: f64,
+}
 
-    /// Generates light color schemes when true
-    #[arg(short, long, default_value_t = false)]
-    pub light_mode: bool,
+impl Default for ParseColorsSettings {
+    fn default() -> Self {
+        Self { segment_size: 16.0 }
+    }
 }
 
 pub fn lch_to_hex(color: &Oklch<f64>) -> String {
@@ -27,10 +22,7 @@ pub fn lch_to_hex(color: &Oklch<f64>) -> String {
     format!("{0:02x}{1:02x}{2:02x}", rgb.red, rgb.green, rgb.blue)
 }
 
-pub fn parse_colors(image: &mut RgbImage) -> Vec<Oklch<f64>> {
-    let segment_size = 16.0;
-    let k = 5;
-
+pub fn parse_colors(image: &mut RgbImage, settings: &ParseColorsSettings) -> Vec<Oklch<f64>> {
     // Put image into OkLab color space
     let oklab_image = <&[Srgb<u8>]>::from_components(&**image)
         .iter()
@@ -49,7 +41,7 @@ pub fn parse_colors(image: &mut RgbImage) -> Vec<Oklch<f64>> {
             pixel
                 .hue
                 .into_positive_degrees()
-                .div(360.0 / segment_size)
+                .div(360.0 / settings.segment_size)
                 .floor() as u16
         })
         .fold((0, 0.0, 0.0, 0.0), |(count, l, c, h), _, pixel| {
@@ -63,7 +55,6 @@ pub fn parse_colors(image: &mut RgbImage) -> Vec<Oklch<f64>> {
         .values()
         .sorted_unstable_by_key(|(count, _, _, _)| count)
         .rev()
-        .take(k)
         .map(|(count, l, c, h)| {
             let count = *count as f64;
             Oklch::new(l / count, c / count, h / count)
