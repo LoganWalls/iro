@@ -93,7 +93,7 @@ fn parse_line(input: &str) -> IResult<&str, Case> {
 
     view! {
         <style type="text/css" media="screen" inner_html=style_content></style>
-        <pre>
+        <pre class="backdrop-blur-sm opacity-90 rounded-lg">
             <code _ref=code_ref class="language-rust">
                 {test_code}
             </code>
@@ -122,7 +122,7 @@ where
         );
     };
     view! {
-        <div>
+        <div class="flex flex-row gap-2">
             <label for=&name_slug>{name}</label>
             <input
                 type="range"
@@ -156,6 +156,12 @@ pub fn ImagePreview() -> impl IntoView {
     let b24_style = move || {
         style_from_bytes(image_bytes, &parse_colors_settings(), &palette_settings()).unwrap()
     };
+
+    let bg_image_style = format!("background-image: url(\"data:image/png;base64,{base64_data}\");");
+    let bg_style = move || {
+        let hex = lch_to_hex(&b24_style().palette[0]);
+        format!("{bg_image_style} background-color: #{hex};")
+    };
     let palette_color_chips = move || {
         b24_style()
             .palette
@@ -165,19 +171,30 @@ pub fn ImagePreview() -> impl IntoView {
     };
 
     view! {
-        <div style="display: flex; flex-direction: row; gap: 2em;">
-            <img style="width: 80em;" src=format!("data:image/png;base64,{base64_data}")/>
-            <div style="display: flex; width: 60em; flex-wrap: wrap; gap: 0.5em;">
-                <div>
-                    <ValueSlider
-                        name="Segment Size"
-                        value_signal=segment_size
-                        min=1.0
-                        max=180.0
-                        step=1.0
-                    />
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(3, 1fr); gap: 0.5em 0.5em;">
+        <div
+            style=bg_style
+            class="
+            bg-center
+            bg-contain
+            bg-no-repeat
+            w-screen
+            h-screen 
+            flex
+            flex-row
+            items-center
+            place-content-center
+            gap-2
+            "
+        >
+            <div class="flex flex-col items-center content-center gap-2">
+                <ValueSlider
+                    name="Segment Size"
+                    value_signal=segment_size
+                    min=1.0
+                    max=180.0
+                    step=1.0
+                />
+                <div class="grid grid-cols-8 grid-rows-3 gap-x-1 gap-y-1">
                     {palette_color_chips}
                 </div>
                 <CodePreview style=b24_style/>
