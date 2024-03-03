@@ -46,8 +46,8 @@ fn style_from_bytes(
 #[component]
 pub fn ColorChip(color: Oklch<f64>) -> impl IntoView {
     let hex = lch_to_hex(&color);
-    let style = format!("width: 3em; height: 3em; border-radius: 3em; background-color: #{hex};");
-    view! { <div style={style}></div>  }
+    let style = format!("background-color: #{hex};");
+    view! { <div class="rounded-full size-12" style=style></div> }
 }
 
 #[component]
@@ -92,8 +92,12 @@ fn parse_line(input: &str) -> IResult<&str, Case> {
     set_timeout(on_load, Duration::from_millis(100));
 
     view! {
-        <style type="text/css" media="screen" inner_html={style_content}></style>
-        <pre><code _ref={code_ref} class="language-rust">{test_code}</code></pre>
+        <style type="text/css" media="screen" inner_html=style_content></style>
+        <pre>
+            <code _ref=code_ref class="language-rust">
+                {test_code}
+            </code>
+        </pre>
     }
 }
 
@@ -119,9 +123,17 @@ where
     };
     view! {
         <div>
-        <label for={&name_slug}>{name}</label>
-        <input type="range" on:change=callback name={&name_slug} min={min.to_string()} max={max.to_string()} step={step.to_string()} value={value_signal.get_untracked().to_string()} />
-        <span>{move || value_signal().to_string()}</span>
+            <label for=&name_slug>{name}</label>
+            <input
+                type="range"
+                on:change=callback
+                name=&name_slug
+                min=min.to_string()
+                max=max.to_string()
+                step=step.to_string()
+                value=value_signal.get_untracked().to_string()
+            />
+            <span>{move || value_signal().to_string()}</span>
         </div>
     }
 }
@@ -148,19 +160,27 @@ pub fn ImagePreview() -> impl IntoView {
         b24_style()
             .palette
             .into_iter()
-            .map(|color| view! { <ColorChip color={color}/> })
+            .map(|color| view! { <ColorChip color=color/> })
             .collect::<Vec<_>>()
     };
 
     view! {
         <div style="display: flex; flex-direction: row; gap: 2em;">
-            <img style="width: 80em;" src={format!("data:image/png;base64,{base64_data}")} />
+            <img style="width: 80em;" src=format!("data:image/png;base64,{base64_data}")/>
             <div style="display: flex; width: 60em; flex-wrap: wrap; gap: 0.5em;">
                 <div>
-                    <ValueSlider name="Segment Size" value_signal={segment_size} min=1.0 max=180.0 step=1.0 />
+                    <ValueSlider
+                        name="Segment Size"
+                        value_signal=segment_size
+                        min=1.0
+                        max=180.0
+                        step=1.0
+                    />
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(3, 1fr); gap: 0.5em 0.5em;">{palette_color_chips}</div>
-                <CodePreview style={b24_style} />
+                <div style="display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(3, 1fr); gap: 0.5em 0.5em;">
+                    {palette_color_chips}
+                </div>
+                <CodePreview style=b24_style/>
             </div>
         </div>
     }
