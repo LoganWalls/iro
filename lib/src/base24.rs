@@ -9,7 +9,7 @@ use std::{array, iter};
 
 use crate::lch_to_hex;
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Clone, Debug)]
 pub struct Base24Style {
     pub name: String,
     pub author: String,

@@ -51,7 +51,7 @@ pub fn ColorChip(color: Oklch<f64>) -> impl IntoView {
 }
 
 #[component]
-pub fn CodePreview<F: Fn() -> Base24Style + 'static>(style: F) -> impl IntoView {
+pub fn CodePreview(style: Signal<Base24Style>) -> impl IntoView {
     let test_code = r#"
 fn parse_line(input: &str) -> IResult<&str, Case> {
     let (input, is_negated) = opt(tag("!"))(input)?;
@@ -85,6 +85,11 @@ fn parse_line(input: &str) -> IResult<&str, Case> {
         t
     };
     let code_ref = create_node_ref::<Code>();
+    let bg_style = move || {
+        let hex = lch_to_hex(&style().palette[0]);
+        format!("background-color: #{hex};")
+    };
+
     let on_load = move || {
         let node = code_ref.get().expect("code tag loaded");
         highlight_element(&node);
@@ -92,12 +97,15 @@ fn parse_line(input: &str) -> IResult<&str, Case> {
     set_timeout(on_load, Duration::from_millis(100));
 
     view! {
-        <style type="text/css" media="screen" inner_html=style_content></style>
-        <pre class="backdrop-blur-sm opacity-90 rounded-lg">
-            <code _ref=code_ref class="language-rust">
-                {test_code}
-            </code>
-        </pre>
+        <div class="relative">
+            <style type="text/css" media="screen" inner_html=style_content></style>
+            <div style=bg_style class="absolute top-0 left-0 size-full rounded-lg opacity-90 backdrop-blur-sm"></div>
+            <pre class="relative z-10">
+                <code _ref=code_ref class="language-rust">
+                    {test_code}
+                </code>
+            </pre>
+        </div>
     }
 }
 
@@ -153,9 +161,9 @@ pub fn ImagePreview() -> impl IntoView {
         ..Default::default()
     };
 
-    let b24_style = move || {
+    let b24_style = Signal::derive(move || {
         style_from_bytes(image_bytes, &parse_colors_settings(), &palette_settings()).unwrap()
-    };
+    });
 
     let bg_image_style = format!("background-image: url(\"data:image/png;base64,{base64_data}\");");
     let bg_style = move || {
@@ -163,7 +171,8 @@ pub fn ImagePreview() -> impl IntoView {
         format!("{bg_image_style} background-color: #{hex};")
     };
     let palette_color_chips = move || {
-        b24_style()
+        b24_style
+            .get()
             .palette
             .into_iter()
             .map(|color| view! { <ColorChip color=color/> })
