@@ -176,10 +176,11 @@ pub fn ImageUpload(set_bytes: WriteSignal<Vec<u8>>) -> impl IntoView {
     view! { <input on:change=callback type="file" _ref=input_ref accept="image/*"/> }
 }
 
+static DEFAULT_IMAGE: &[u8] = include_bytes!("../static/shirasuka-shiomi-slope.png");
+
 #[component]
 pub fn ImagePreview() -> impl IntoView {
-    let (image_bytes, set_image_bytes) =
-        create_signal(include_bytes!("../static/shirasuka-shiomi-slope.png").to_vec());
+    let (image_bytes, set_image_bytes) = create_signal(DEFAULT_IMAGE.to_vec());
     let base64_data = move || BASE64_STANDARD.encode(image_bytes());
     let segment_size = create_rw_signal(15.0);
     // create_effect(move |_| console_log(&segment_size().to_string()));
