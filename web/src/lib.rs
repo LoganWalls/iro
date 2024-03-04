@@ -173,7 +173,29 @@ pub fn ImageUpload(set_bytes: WriteSignal<Box<[u8]>>) -> impl IntoView {
             reader.read_as_array_buffer(&file).unwrap()
         }
     };
-    view! { <input on:change=callback type="file" _ref=input_ref accept="image/*"/> }
+
+    view! {
+        <input on:change=callback type="file" _ref=input_ref accept="image/*" class="hidden"/>
+        <button
+            title="Upload image"
+            on:click=move |_| input_ref.get().expect("file input exists").click()
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-6 h-6"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
+                ></path>
+            </svg>
+        </button>
+    }
 }
 
 static DEFAULT_IMAGE: &[u8] = include_bytes!("../static/shirasuka-shiomi-slope.png");
@@ -235,6 +257,23 @@ pub fn ImagePreview() -> impl IntoView {
         });
     };
 
+    let copy_button = view! {
+        <button title="Copy YAML colorscheme to clipboard" on:click=copy_yaml>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                class="w-6 h-6"
+            >
+                <path
+                    fill-rule="evenodd"
+                    d="M10.5 3A1.501 1.501 0 0 0 9 4.5h6A1.5 1.5 0 0 0 13.5 3h-3Zm-2.693.178A3 3 0 0 1 10.5 1.5h3a3 3 0 0 1 2.694 1.678c.497.042.992.092 1.486.15 1.497.173 2.57 1.46 2.57 2.929V19.5a3 3 0 0 1-3 3H6.75a3 3 0 0 1-3-3V6.257c0-1.47 1.073-2.756 2.57-2.93.493-.057.989-.107 1.487-.15Z"
+                    clip-rule="evenodd"
+                ></path>
+            </svg>
+        </button>
+    };
+
     view! {
         <div
             style=bg_style
@@ -252,16 +291,17 @@ pub fn ImagePreview() -> impl IntoView {
             "
         >
             <div class="flex flex-col items-center content-center gap-2">
-                <ValueSlider
-                    name="Segment Size"
-                    value_signal=segment_size
-                    min=1.0
-                    max=180.0
-                    step=1.0
-                />
-                <div>
-                    <button on:click=copy_yaml>Copy YAML</button>
-                    <ImageUpload set_bytes=set_image_bytes/>
+                <div class="flex flex-row gap-2">
+                    <ValueSlider
+                        name="Segment Size"
+                        value_signal=segment_size
+                        min=1.0
+                        max=180.0
+                        step=1.0
+                    />
+                    <div class="flex flex-row gap-2">
+                        {copy_button} <ImageUpload set_bytes=set_image_bytes/>
+                    </div>
                 </div>
                 <div class="grid grid-cols-8 grid-rows-3 gap-x-1 gap-y-1">
                     {palette_color_chips}
