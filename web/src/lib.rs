@@ -198,20 +198,79 @@ pub fn ImageUpload(set_bytes: WriteSignal<Box<[u8]>>) -> impl IntoView {
     }
 }
 
+#[component]
+pub fn Toggle(
+    signal: RwSignal<bool>,
+    true_label: &'static str,
+    false_label: &'static str,
+) -> impl IntoView {
+    let label = move || match signal.get() {
+        true => true_label,
+        false => false_label,
+    };
+    let callback = move |ev| signal.set(event_target_checked(&ev));
+    view! {
+        <label class="inline-flex gap-2 items-center cursor-pointer">
+            <span>{label}</span>
+            <input
+                on:change=callback
+                checked=signal.get_untracked()
+                type="checkbox"
+                class="sr-only peer"
+            />
+            <div class="
+            relative
+            w-11
+            h-6
+            bg-gray-200
+            peer-focus:outline-none
+            peer-focus:ring-4
+            peer-focus:ring-blue-300
+            dark:peer-focus:ring-blue-800
+            rounded-full
+            peer
+            dark:bg-gray-700
+            peer-checked:after:translate-x-full
+            rtl:peer-checked:after:-translate-x-full
+            peer-checked:after:border-white
+            after:content-['']
+            after:absolute
+            after:top-[2px]
+            after:start-[2px]
+            after:bg-white
+            after:border-gray-300
+            after:border
+            after:rounded-full
+            after:h-5
+            after:w-5
+            after:transition-all
+            dark:border-gray-600
+            peer-checked:bg-blue-600"></div>
+        </label>
+    }
+}
+
 static DEFAULT_IMAGE: &[u8] = include_bytes!("../static/shirasuka-shiomi-slope.png");
 
 #[cfg(web_sys_unstable_apis)]
 #[component]
 pub fn ImagePreview() -> impl IntoView {
+    use iro::base24::PaletteStyle;
+
     let (image_bytes, set_image_bytes) = create_signal::<Box<[u8]>>(DEFAULT_IMAGE.into());
     let base64_data = move || BASE64_STANDARD.encode(image_bytes());
     let segment_size = create_rw_signal(15.0);
+    let dark_mode = create_rw_signal(true);
 
     let parse_colors_settings = move || ParseColorsSettings {
         segment_size: segment_size.get(),
     };
 
     let palette_settings = move || PaletteSettings {
+        style: match dark_mode() {
+            true => PaletteStyle::Dark,
+            false => PaletteStyle::Light,
+        },
         ..Default::default()
     };
 
@@ -292,13 +351,16 @@ pub fn ImagePreview() -> impl IntoView {
         >
             <div class="flex flex-col items-center content-center gap-2">
                 <div class="flex flex-row gap-2">
-                    <ValueSlider
-                        name="Segment Size"
-                        value_signal=segment_size
-                        min=1.0
-                        max=180.0
-                        step=1.0
-                    />
+                    <div class="flex flex-col gap-2">
+                        <Toggle signal=dark_mode true_label="Dark Mode" false_label="Light Mode"/>
+                        <ValueSlider
+                            name="Segment Size"
+                            value_signal=segment_size
+                            min=1.0
+                            max=180.0
+                            step=1.0
+                        />
+                    </div>
                     <div class="flex flex-row gap-2">
                         {copy_button} <ImageUpload set_bytes=set_image_bytes/>
                     </div>

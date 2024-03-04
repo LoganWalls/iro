@@ -100,8 +100,8 @@ pub fn generate_palette(
         }
         PaletteStyle::Light => {
             base_chroma = 0.04;
-            highlight_lightness = 0.4;
-            highlight_chroma = 0.13;
+            highlight_lightness = 0.5;
+            highlight_chroma = 0.14;
             base_colors_it = Either::Left((1..=8).rev());
             base24_bg = [
                 Oklch::new(0.85, base_chroma, base_hue),
