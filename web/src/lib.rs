@@ -151,7 +151,7 @@ where
 }
 
 #[component]
-pub fn ImageUpload(set_bytes: WriteSignal<Vec<u8>>) -> impl IntoView {
+pub fn ImageUpload(set_bytes: WriteSignal<Box<[u8]>>) -> impl IntoView {
     let input_ref = create_node_ref::<Input>();
     let callback = move |_| {
         if let Some(files) = input_ref.get().and_then(|f: HtmlElement<Input>| f.files()) {
@@ -164,7 +164,7 @@ pub fn ImageUpload(set_bytes: WriteSignal<Vec<u8>>) -> impl IntoView {
                     .dyn_into::<web_sys::FileReader>()
                     .unwrap();
                 let result = Uint8Array::new(&reader.result().unwrap()).to_vec();
-                set_bytes(result);
+                set_bytes(result.into());
             }) as Box<dyn FnMut(_)>);
             reader
                 .add_event_listener_with_callback("loadend", onload.as_ref().unchecked_ref())
@@ -180,10 +180,9 @@ static DEFAULT_IMAGE: &[u8] = include_bytes!("../static/shirasuka-shiomi-slope.p
 
 #[component]
 pub fn ImagePreview() -> impl IntoView {
-    let (image_bytes, set_image_bytes) = create_signal(DEFAULT_IMAGE.to_vec());
+    let (image_bytes, set_image_bytes) = create_signal::<Box<[u8]>>(DEFAULT_IMAGE.into());
     let base64_data = move || BASE64_STANDARD.encode(image_bytes());
     let segment_size = create_rw_signal(15.0);
-    // create_effect(move |_| console_log(&segment_size().to_string()));
 
     let parse_colors_settings = move || ParseColorsSettings {
         segment_size: segment_size.get(),
