@@ -181,7 +181,7 @@ pub fn ImagePreview() -> impl IntoView {
     let (image_bytes, set_image_bytes) =
         create_signal(include_bytes!("../static/shirasuka-shiomi-slope.png").to_vec());
     let base64_data = move || BASE64_STANDARD.encode(image_bytes());
-    let segment_size = create_rw_signal(16.0);
+    let segment_size = create_rw_signal(15.0);
     // create_effect(move |_| console_log(&segment_size().to_string()));
 
     let parse_colors_settings = move || ParseColorsSettings {

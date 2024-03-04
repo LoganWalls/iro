@@ -21,7 +21,7 @@ pub struct Args {
     pub keep_image_colors: usize,
 
     /// The size (in degrees) of a color wheel segment that should be treated as a single hue
-    #[arg(short, long, default_value_t = 16.0)]
+    #[arg(short, long, default_value_t = 15.0)]
     pub segment_size: f64,
 }
 

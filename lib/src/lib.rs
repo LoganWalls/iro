@@ -13,7 +13,7 @@ pub struct ParseColorsSettings {
 
 impl Default for ParseColorsSettings {
     fn default() -> Self {
-        Self { segment_size: 16.0 }
+        Self { segment_size: 15.0 }
     }
 }
 
