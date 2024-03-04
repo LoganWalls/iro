@@ -178,6 +178,7 @@ pub fn ImageUpload(set_bytes: WriteSignal<Box<[u8]>>) -> impl IntoView {
 
 static DEFAULT_IMAGE: &[u8] = include_bytes!("../static/shirasuka-shiomi-slope.png");
 
+#[cfg(web_sys_unstable_apis)]
 #[component]
 pub fn ImagePreview() -> impl IntoView {
     let (image_bytes, set_image_bytes) = create_signal::<Box<[u8]>>(DEFAULT_IMAGE.into());
@@ -200,7 +201,6 @@ pub fn ImagePreview() -> impl IntoView {
         )
         .unwrap()
     });
-
     let bg_image_style = move || {
         format!(
             "background-image: url(\"data:image/png;base64,{}\");",
@@ -218,6 +218,21 @@ pub fn ImagePreview() -> impl IntoView {
             .into_iter()
             .map(|color| view! { <ColorChip color=color/> })
             .collect::<Vec<_>>()
+    };
+
+    let copy_yaml = move |_| {
+        let yaml = serde_yaml::to_string(&b24_style()).expect("serializable style");
+        spawn_local(async move {
+            let clipboard = web_sys::window()
+                .expect("window exists")
+                .navigator()
+                .clipboard()
+                .expect("clipboard exists");
+            let promise = clipboard.write_text(&yaml);
+            wasm_bindgen_futures::JsFuture::from(promise)
+                .await
+                .expect("clipboard populated");
+        });
     };
 
     view! {
@@ -244,7 +259,10 @@ pub fn ImagePreview() -> impl IntoView {
                     max=180.0
                     step=1.0
                 />
-                <ImageUpload set_bytes=set_image_bytes/>
+                <div>
+                    <button on:click=copy_yaml>Copy YAML</button>
+                    <ImageUpload set_bytes=set_image_bytes/>
+                </div>
                 <div class="grid grid-cols-8 grid-rows-3 gap-x-1 gap-y-1">
                     {palette_color_chips}
                 </div>
