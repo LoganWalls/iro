@@ -4,8 +4,9 @@ use image::imageops::FilterType::Nearest;
 use image::io::Reader as ImageReader;
 use iro::base24::PaletteSettings;
 use iro::{generate_palette, lch_to_hex, parse_colors, Base24Style, Oklch, ParseColorsSettings};
-use leptos::html::Code;
+use leptos::html::{Code, Input};
 use leptos::*;
+use web_sys::js_sys::Uint8Array;
 
 use std::io::Cursor;
 use std::str::FromStr;
@@ -99,7 +100,10 @@ fn parse_line(input: &str) -> IResult<&str, Case> {
     view! {
         <div class="relative">
             <style type="text/css" media="screen" inner_html=style_content></style>
-            <div style=bg_style class="absolute top-0 left-0 size-full rounded-lg opacity-90 backdrop-blur-sm"></div>
+            <div
+                style=bg_style
+                class="absolute top-0 left-0 size-full rounded-lg opacity-90 backdrop-blur-sm"
+            ></div>
             <pre class="relative z-10">
                 <code _ref=code_ref class="language-rust">
                     {test_code}
@@ -147,9 +151,36 @@ where
 }
 
 #[component]
+pub fn ImageUpload(set_bytes: WriteSignal<Vec<u8>>) -> impl IntoView {
+    let input_ref = create_node_ref::<Input>();
+    let callback = move |_| {
+        if let Some(files) = input_ref.get().and_then(|f: HtmlElement<Input>| f.files()) {
+            let file = files.get(0).expect("file to contain one file");
+            let reader = web_sys::FileReader::new().unwrap();
+            let onload = Closure::wrap(Box::new(move |event: web_sys::Event| {
+                let reader = event
+                    .target()
+                    .unwrap()
+                    .dyn_into::<web_sys::FileReader>()
+                    .unwrap();
+                let result = Uint8Array::new(&reader.result().unwrap()).to_vec();
+                set_bytes(result);
+            }) as Box<dyn FnMut(_)>);
+            reader
+                .add_event_listener_with_callback("loadend", onload.as_ref().unchecked_ref())
+                .unwrap();
+            onload.forget();
+            reader.read_as_array_buffer(&file).unwrap()
+        }
+    };
+    view! { <input on:change=callback type="file" _ref=input_ref accept="image/*"/> }
+}
+
+#[component]
 pub fn ImagePreview() -> impl IntoView {
-    let image_bytes = include_bytes!("../static/shirasuka-shiomi-slope.png");
-    let base64_data = BASE64_STANDARD.encode(image_bytes);
+    let (image_bytes, set_image_bytes) =
+        create_signal(include_bytes!("../static/shirasuka-shiomi-slope.png").to_vec());
+    let base64_data = move || BASE64_STANDARD.encode(image_bytes());
     let segment_size = create_rw_signal(16.0);
     // create_effect(move |_| console_log(&segment_size().to_string()));
 
@@ -162,13 +193,23 @@ pub fn ImagePreview() -> impl IntoView {
     };
 
     let b24_style = Signal::derive(move || {
-        style_from_bytes(image_bytes, &parse_colors_settings(), &palette_settings()).unwrap()
+        style_from_bytes(
+            &image_bytes(),
+            &parse_colors_settings(),
+            &palette_settings(),
+        )
+        .unwrap()
     });
 
-    let bg_image_style = format!("background-image: url(\"data:image/png;base64,{base64_data}\");");
+    let bg_image_style = move || {
+        format!(
+            "background-image: url(\"data:image/png;base64,{}\");",
+            base64_data()
+        )
+    };
     let bg_style = move || {
         let hex = lch_to_hex(&b24_style().palette[0]);
-        format!("{bg_image_style} background-color: #{hex};")
+        format!("{} background-color: #{hex};", bg_image_style())
     };
     let palette_color_chips = move || {
         b24_style
@@ -203,6 +244,7 @@ pub fn ImagePreview() -> impl IntoView {
                     max=180.0
                     step=1.0
                 />
+                <ImageUpload set_bytes=set_image_bytes/>
                 <div class="grid grid-cols-8 grid-rows-3 gap-x-1 gap-y-1">
                     {palette_color_chips}
                 </div>
