@@ -65,7 +65,8 @@ impl Default for PaletteStyle {
 
 pub struct PaletteSettings {
     pub style: PaletteStyle,
-    pub keep: Option<usize>,
+    pub keep: usize,
+    pub rotation: usize,
     pub base_chroma: f64,
     pub hl_lightness: f64,
     pub hl_chroma: f64,
@@ -76,14 +77,16 @@ impl PaletteSettings {
         match style {
             PaletteStyle::Dark => Self {
                 style: PaletteStyle::Dark,
-                keep: None,
+                keep: 5,
+                rotation: 0,
                 base_chroma: 0.03,
                 hl_chroma: 0.12,
                 hl_lightness: 0.6,
             },
             PaletteStyle::Light => Self {
                 style: PaletteStyle::Light,
-                keep: None,
+                keep: 5,
+                rotation: 0,
                 base_chroma: 0.04,
                 hl_chroma: 0.14,
                 hl_lightness: 0.5,
@@ -125,19 +128,22 @@ pub fn generate_palette(
         base_colors_it.map(|l| Oklch::new(l as f64 * 0.125, settings.base_chroma, base_hue));
 
     let mut i = 0;
+
+    colors = colors.into_iter().take(settings.keep.min(8)).collect();
     while colors.len() < 8 {
         colors.push(colors[i]);
         i += 1;
     }
     let (highlights, highlights_tee) = colors
         .iter()
-        .take(settings.keep.unwrap_or(colors.len()))
         .sorted_unstable_by(|a, b| a.chroma.partial_cmp(&b.chroma).expect("comparable chromas"))
         .rev()
         .take(8)
         .map(|color| color.hue)
         .sorted_unstable_by_key(|hue| hue.into_positive_degrees() as u16)
-        .map(|hue| Oklch::new(settings.hl_lightness, settings.hl_chroma, hue))
+        .enumerate()
+        .sorted_unstable_by_key(|(i, _)| (i + settings.rotation) % 8)
+        .map(|(_, hue)| Oklch::new(settings.hl_lightness, settings.hl_chroma, hue))
         .tee();
 
     let bright_highlights = highlights_tee.enumerate().filter_map(|(i, color)| {

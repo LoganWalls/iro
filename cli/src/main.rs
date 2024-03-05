@@ -17,8 +17,12 @@ pub struct Args {
     pub light: bool,
 
     /// The number of colors to keep from the image
-    #[arg(short, long)]
-    pub keep: Option<usize>,
+    #[arg(short, long, default_value_t = 5)]
+    pub keep: usize,
+
+    /// How many positions to rotate the highlight colors
+    #[arg(short, long, default_value_t = 0)]
+    pub rotation: usize,
 
     /// The size (in degrees) of a color wheel segment that should be treated as a single hue
     #[arg(short, long, default_value_t = 15.0)]
@@ -48,6 +52,7 @@ impl From<Args> for PaletteSettings {
         Self {
             style,
             keep: args.keep,
+            rotation: args.rotation,
             base_chroma: args.base_chroma.unwrap_or(defaults.base_chroma),
             hl_chroma: args.hl_chroma.unwrap_or(defaults.hl_chroma),
             hl_lightness: args.hl_lightness.unwrap_or(defaults.hl_lightness),

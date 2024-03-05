@@ -69,6 +69,8 @@ pub fn ImagePreview() -> impl IntoView {
 
     let segment_size = create_rw_signal(default_parse_settings.segment_size);
     let dark_mode = create_rw_signal(default_settings.style == PaletteStyle::Dark);
+    let keep = create_rw_signal(5);
+    let rotation = create_rw_signal(0);
     let base_chroma = create_rw_signal(default_settings.base_chroma);
     let hl_chroma = create_rw_signal(default_settings.hl_chroma);
     let hl_lightness = create_rw_signal(default_settings.hl_lightness);
@@ -82,10 +84,11 @@ pub fn ImagePreview() -> impl IntoView {
             true => PaletteStyle::Dark,
             false => PaletteStyle::Light,
         },
+        keep: keep(),
+        rotation: rotation(),
         base_chroma: base_chroma(),
         hl_lightness: hl_lightness(),
         hl_chroma: hl_chroma(),
-        ..Default::default()
     };
     let image_colors = create_memo(move |_| {
         colors_from_image(&image_bytes(), &parse_colors_settings())
@@ -170,6 +173,8 @@ pub fn ImagePreview() -> impl IntoView {
                                     false_label="Light Mode"
                                 />
                             </div>
+                            <ValueSlider name="Unique Colors" value_signal=keep min=1 max=8 step=1/>
+                            <ValueSlider name="Rotate" value_signal=rotation min=0 max=7 step=1/>
                             <ValueSlider
                                 name="Base Chroma"
                                 value_signal=base_chroma
