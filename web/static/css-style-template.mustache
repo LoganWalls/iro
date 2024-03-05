@@ -1,3 +1,115 @@
+input[type=range] {
+  height: 38px;
+  -webkit-appearance: none;
+  background: transparent;
+}
+
+input[type=range]:focus {
+  outline: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 3px;
+  cursor: pointer;
+  animate: 0.2s;
+  box-shadow: 1px 1px 1px #000000;
+  background: #{{base08-hex}};
+  border-radius: 5px;
+}
+
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 3px;
+  cursor: pointer;
+  animate: 0.2s;
+  box-shadow: 1px 1px 1px #000000;
+  background: #{{base08-hex}};
+  border-radius: 5px;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #{{base12-hex}};
+}
+
+input[type=range]:focus::-moz-range-track {
+  background: #{{base12-hex}};
+}
+
+input[type=range]::-moz-range-thumb {
+  box-shadow: 1px 1px 1px #000000;
+  border: 1px solid #000000;
+  height: 1em;
+  width: 1em;
+  border-radius: 1em;
+  background: #{{base05-hex}};
+  cursor: pointer;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 1px 1px 1px #000000;
+  border: 1px solid #000000;
+  height: 1em;
+  width: 1em;
+  border-radius: 1em;
+  background: #{{base05-hex}};
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -6px;
+}
+
+.switch {
+  position: relative;
+  width: 3.7em;
+  height: 2em;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 2em;
+  background-color: #{{base01-hex}};
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.5em;
+  width: 1.5em;
+  left: 4px;
+  bottom: 4px;
+  border-radius: 50%;
+  background-color: #{{base05-hex}};
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+input:checked + .slider {
+  background-color: #{{base08-hex}};
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #{{base12-hex}};;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
 /* base16-prism (https://github.com/atelierbram/base16-prism)
   by Bram de Haan (http://atelierbramdehaan.nl)
   Copyright (c) 2024 Bram de Haan, http://atelierbramdehaan.nl

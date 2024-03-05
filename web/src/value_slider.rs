@@ -22,18 +22,20 @@ where
         );
     };
     view! {
-        <div class="flex flex-row gap-2">
-            <label for=&name_slug>{name}</label>
+        <div class="flex flex-row gap-2 place-content-between">
             <input
                 type="range"
-                on:change=callback
+                on:input=callback
                 name=&name_slug
                 min=min.to_string()
                 max=max.to_string()
                 step=step.to_string()
                 value=value_signal.get_untracked().to_string()
             />
-            <span>{move || value_signal().to_string()}</span>
+            <div class="flex flex-row align-right gap-10">
+                <label for=&name_slug>{name}</label>
+                <span class="w-10">{move || value_signal().to_string()}</span>
+            </div>
         </div>
     }
 }

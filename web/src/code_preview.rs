@@ -1,7 +1,7 @@
+use crate::backdrop::Backdrop;
 use iro::{lch_to_hex, Base24Style};
 use leptos::html::Code;
 use leptos::*;
-
 use std::time::Duration;
 use wasm_bindgen::prelude::*;
 
@@ -46,10 +46,10 @@ fn parse_line(input: &str) -> IResult<&str, Case> {
         t
     };
     let code_ref = create_node_ref::<Code>();
-    let bg_style = move || {
+    let bg_style = Signal::derive(move || {
         let hex = lch_to_hex(&style().palette[0]);
         format!("background-color: #{hex};")
-    };
+    });
 
     let on_load = move || {
         let node = code_ref.get().expect("code tag loaded");
@@ -60,10 +60,7 @@ fn parse_line(input: &str) -> IResult<&str, Case> {
     view! {
         <div class="relative">
             <style type="text/css" media="screen" inner_html=style_content></style>
-            <div
-                style=bg_style
-                class="absolute top-0 left-0 size-full rounded-lg opacity-90 backdrop-blur-sm"
-            ></div>
+            <Backdrop style=bg_style/>
             <pre class="relative z-10">
                 <code _ref=code_ref class="language-rust">
                     {test_code}
