@@ -17,23 +17,40 @@ pub struct Args {
     pub light: bool,
 
     /// The number of colors to keep from the image
-    #[arg(short, long, default_value_t = 5)]
-    pub keep_image_colors: usize,
+    #[arg(short, long)]
+    pub keep: Option<usize>,
 
     /// The size (in degrees) of a color wheel segment that should be treated as a single hue
     #[arg(short, long, default_value_t = 15.0)]
     pub segment_size: f64,
+
+    /// The chroma to use for base colors
+    #[arg(short, long)]
+    pub base_chroma: Option<f64>,
+
+    /// The lightness to use for highlight colors
+    #[arg(short, long)]
+    pub hl_lightness: Option<f64>,
+
+    /// The chroma to use for highlight colors
+    #[arg(short, long)]
+    pub hl_chroma: Option<f64>,
 }
 
 impl From<Args> for PaletteSettings {
     fn from(args: Args) -> Self {
+        let style = if args.light {
+            PaletteStyle::Light
+        } else {
+            PaletteStyle::Dark
+        };
+        let defaults = PaletteSettings::default_for(style);
         Self {
-            style: if args.light {
-                PaletteStyle::Light
-            } else {
-                PaletteStyle::Dark
-            },
-            keep_image_colors: Some(args.keep_image_colors),
+            style,
+            keep: args.keep,
+            base_chroma: args.base_chroma.unwrap_or(defaults.base_chroma),
+            hl_chroma: args.hl_chroma.unwrap_or(defaults.hl_chroma),
+            hl_lightness: args.hl_lightness.unwrap_or(defaults.hl_lightness),
         }
     }
 }
