@@ -51,7 +51,7 @@ pub fn color_array<const N: usize>(
     Some(colors.map(|color| unsafe { color.assume_init() }))
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PaletteStyle {
     Dark,
     Light,
@@ -72,7 +72,7 @@ pub struct PaletteSettings {
 }
 
 impl PaletteSettings {
-    pub fn default_for(style: PaletteStyle) -> Self{ 
+    pub fn default_for(style: PaletteStyle) -> Self {
         match style {
             PaletteStyle::Dark => Self {
                 style: PaletteStyle::Dark,
@@ -89,7 +89,6 @@ impl PaletteSettings {
                 hl_lightness: 0.5,
             },
         }
-
     }
 }
 
@@ -122,7 +121,8 @@ pub fn generate_palette(
             ];
         }
     };
-    let base_colors = base_colors_it.map(|l| Oklch::new(l as f64 * 0.125, settings.base_chroma, base_hue));
+    let base_colors =
+        base_colors_it.map(|l| Oklch::new(l as f64 * 0.125, settings.base_chroma, base_hue));
 
     let mut i = 0;
     while colors.len() < 8 {

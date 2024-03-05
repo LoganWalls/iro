@@ -9,6 +9,7 @@ use crate::copy_button::CopyButton;
 use crate::image_upload::ImageUpload;
 use crate::toggle::Toggle;
 use crate::value_slider::ValueSlider;
+use iro::base24::PaletteStyle;
 
 use anyhow::Result;
 use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
@@ -57,12 +58,18 @@ static DEFAULT_IMAGE: &[u8] = include_bytes!("../static/shirasuka-shiomi-slope.p
 #[cfg(web_sys_unstable_apis)]
 #[component]
 pub fn ImagePreview() -> impl IntoView {
-    use iro::base24::PaletteStyle;
-
     let (image_bytes, set_image_bytes) = create_signal::<Box<[u8]>>(DEFAULT_IMAGE.into());
     let base64_data = move || BASE64_STANDARD.encode(image_bytes());
-    let segment_size = create_rw_signal(15.0);
-    let dark_mode = create_rw_signal(true);
+
+    let default_parse_settings = ParseColorsSettings::default();
+    let default_settings = PaletteSettings::default();
+
+    let segment_size = create_rw_signal(default_parse_settings.segment_size);
+    let dark_mode = create_rw_signal(default_settings.style == PaletteStyle::Dark);
+    let base_chroma = create_rw_signal(default_settings.base_chroma);
+    let hl_chroma = create_rw_signal(default_settings.hl_chroma);
+    let hl_lightness = create_rw_signal(default_settings.hl_lightness);
+
 
     let parse_colors_settings = move || ParseColorsSettings {
         segment_size: segment_size.get(),
@@ -73,6 +80,9 @@ pub fn ImagePreview() -> impl IntoView {
             true => PaletteStyle::Dark,
             false => PaletteStyle::Light,
         },
+        base_chroma: base_chroma(),
+        hl_lightness: hl_lightness(),
+        hl_chroma: hl_chroma(),
         ..Default::default()
     };
 
@@ -133,6 +143,27 @@ pub fn ImagePreview() -> impl IntoView {
                             min=1.0
                             max=180.0
                             step=1.0
+                        />
+                        <ValueSlider
+                            name="Base Chroma"
+                            value_signal=base_chroma
+                            min=0.0
+                            max=0.15
+                            step=0.005
+                        />
+                        <ValueSlider
+                            name="Highlight Chroma"
+                            value_signal=hl_chroma
+                            min=0.0
+                            max=0.15
+                            step=0.005
+                        />
+                        <ValueSlider
+                            name="Highlight Lightness"
+                            value_signal=hl_lightness
+                            min=0.0
+                            max=1.0
+                            step=0.05
                         />
                     </div>
                     <div class="flex flex-row gap-2">
