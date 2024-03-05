@@ -340,16 +340,17 @@ pub fn ImagePreview() -> impl IntoView {
             bg-center
             bg-contain
             bg-no-repeat
-            w-screen
-            h-screen 
+            size-full
             flex
             flex-row
             items-center
             place-content-center
             gap-2
+            p-2
+            overflow-auto
             "
         >
-            <div class="flex flex-col items-center content-center gap-2">
+            <div class="flex flex-col items-center content-center size-full gap-2">
                 <div class="flex flex-row gap-2">
                     <div class="flex flex-col gap-2">
                         <Toggle signal=dark_mode true_label="Dark Mode" false_label="Light Mode"/>
