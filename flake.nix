@@ -30,12 +30,6 @@
         inherit (pkgs) stdenv lib;
         toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
         craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;
-        # buildDeps =
-        #   lib.optionals stdenv.isLinux (with pkgs; [webkitgtk_4_1])
-        #   ++ lib.optionals stdenv.isDarwin (with pkgs.darwin.apple_sdk.frameworks; [
-        #     # WebKit
-        #     # pkgs.libiconv
-        #   ]);
         buildDeps = [];
         crate = craneLib.buildPackage {
           src = craneLib.cleanCargoSource (craneLib.path ./.);
@@ -61,8 +55,10 @@
               trunk
               cargo-watch
               leptosfmt
+              emscripten
             ]
             ++ buildDeps;
+          TS_GRAMMARS = pkgs.tree-sitter.grammars;
           RUST_SRC_PATH = "${toolchain}/lib/rustlib/src/rust/library";
           RUSTFLAGS = "--cfg=web_sys_unstable_apis";
         };
