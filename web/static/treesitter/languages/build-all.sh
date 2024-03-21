@@ -10,7 +10,6 @@ declare -a languages=(
   "c"
   "c-sharp"
   "clojure"
-  "commonlisp"
   "cpp"
   "css"
   "elixir"
@@ -37,31 +36,37 @@ declare -a languages=(
 # variable is set in `flake.nix`
 for lang in "${languages[@]}"; do
   dir="$TS_GRAMMARS/tree-sitter-${lang}"
-  grammar="${dir##*/}"
   if [ "$lang" = "tsx" ]; then
     dir="$TS_GRAMMARS/tree-sitter-typescript"
-    grammar="tree-sitter-tsx"
+  elif [ "$lang" = "markdown" ]; then
+    dir="$TS_GRAMMARS/tree-sitter-markdown/tree-sitter-markdown"
   fi
-  out="${grammar}.wasm"
-  if [ ! -f "$out" ]; then
-    echo "Building $grammar"
-    cp -LR "$dir" "./$grammar"
-    chmod --recursive +rw "$grammar"
-    target="$grammar"
-    if [ "$lang" = "markdown" ]; then
-      target="$target/tree-sitter-markdown" .
-    elif [[ $lang == "ocaml" ]]; then
-      target="$target/ocaml"
+  out="$lang"
+  src="$out-src"
+  if [ ! -d "$out" ]; then
+    mkdir "$out"
+    echo "Building $out"
+    cp -LR "$dir" "./$src"
+    chmod --recursive +rw "$src"
+    root="$src"
+    if [[ $lang == "ocaml" ]]; then
+      root="$root/ocaml"
     elif [[ $lang == "typescript" ]]; then
-      target="$target/typescript"
+      root="$root/typescript"
     elif [[ $lang == "tsx" ]]; then
-      target="$target/tsx"
+      root="$root/tsx"
     fi
     # NOTE: At time of writing the nixpkgs tree-sitter
     # is out of date. I am using an impure install of
     # tree-sitter 0.22.2 with nix-provided emscripten
-    tree-sitter build --wasm "$target" -o "$out"
-    rm -rf "$grammar"
+    tree-sitter build --wasm "$root" -o "$out/grammar.wasm"
+
+    if [[ $lang == "scala" ]]; then
+      cp "$src/queries/scala/highlights.scm" "$out/"
+    else
+      cp "$src/queries/highlights.scm" "$out/"
+    fi
+    rm -rf "$src"
   fi
 done
 
