@@ -3,10 +3,10 @@ window.addEventListener("load", async () => {
 
   async function setLanguage(language) {
     const grammar = await window.TreeSitter.Language.load(
-      `/tree-sitter-languages/${language}/grammar.wasm`,
+      `tree-sitter-languages/${language}/grammar.wasm`,
     );
     const response = await fetch(
-      `/tree-sitter-languages/${language}/highlights.scm`,
+      `tree-sitter-languages/${language}/highlights.scm`,
     );
     const highlightQueries = await response.text();
     await window.TS.parser.setLanguage(grammar);
