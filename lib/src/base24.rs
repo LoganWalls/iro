@@ -77,7 +77,7 @@ impl PaletteSettings {
         match style {
             PaletteStyle::Dark => Self {
                 style: PaletteStyle::Dark,
-                keep: 5,
+                keep: 8,
                 rotation: 0,
                 base_chroma: 0.03,
                 hl_chroma: 0.12,
@@ -85,7 +85,7 @@ impl PaletteSettings {
             },
             PaletteStyle::Light => Self {
                 style: PaletteStyle::Light,
-                keep: 5,
+                keep: 8,
                 rotation: 0,
                 base_chroma: 0.04,
                 hl_chroma: 0.14,

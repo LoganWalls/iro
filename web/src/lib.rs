@@ -69,7 +69,7 @@ pub fn ImagePreview() -> impl IntoView {
 
     let segment_size = create_rw_signal(default_parse_settings.segment_size);
     let dark_mode = create_rw_signal(default_settings.style == PaletteStyle::Dark);
-    let keep = create_rw_signal(5);
+    let keep = create_rw_signal(8);
     let rotation = create_rw_signal(0);
     let base_chroma = create_rw_signal(default_settings.base_chroma);
     let hl_chroma = create_rw_signal(default_settings.hl_chroma);

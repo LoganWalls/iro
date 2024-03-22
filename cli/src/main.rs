@@ -17,7 +17,7 @@ pub struct Args {
     pub light: bool,
 
     /// The number of colors to keep from the image
-    #[arg(short, long, default_value_t = 5)]
+    #[arg(short, long, default_value_t = 8)]
     pub keep: usize,
 
     /// How many positions to rotate the highlight colors

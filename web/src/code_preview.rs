@@ -7,18 +7,21 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace = Prism, js_name = highlightElement)]
+    #[wasm_bindgen(js_namespace = TS, js_name = highlight)]
     fn highlight_element(el: &web_sys::HtmlElement);
+    #[wasm_bindgen(js_namespace = TS, js_name = setLanguage)]
+    async fn set_parser_language(language: &str);
 }
 
 #[component]
 pub fn CodePreview(style: Signal<Base24Style>) -> impl IntoView {
     let test_code = r#"
+/// Parses a line
 fn parse_line(input: &str) -> IResult<&str, Case> {
     let (input, is_negated) = opt(tag("!"))(input)?;
     let is_negated = is_negated.is_some();
     let (input, _) = tag("r ")(input)?;
-    let (input, content) = take_till(|c| c == '\\n')(input)?;
+    let (input, content) = take_till(|c| c == '\n')(input)?;
     let regex = Regex::new(content);
     Ok((
         input,
@@ -50,18 +53,17 @@ fn parse_line(input: &str) -> IResult<&str, Case> {
         let hex = lch_to_hex(&style().palette[0]);
         format!("background-color: #{hex};")
     });
-
     let on_load = move || {
         let node = code_ref.get().expect("code tag loaded");
         highlight_element(&node);
     };
-    set_timeout(on_load, Duration::from_millis(100));
+    set_timeout(on_load, Duration::from_millis(200));
 
     view! {
         <div class="relative">
             <style type="text/css" media="screen" inner_html=style_content></style>
             <Backdrop style=bg_style/>
-            <pre class="relative z-10">
+            <pre class="relative z-10 px-8 py-2">
                 <code _ref=code_ref class="language-rust">
                     {test_code}
                 </code>
