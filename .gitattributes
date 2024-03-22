@@ -1,2 +1,2 @@
-web/static/treesitter/** linguist-vendored
+web/treesitter/** linguist-vendored
 **/tailwind.css linguist-generated
