@@ -1,6 +1,5 @@
 use crate::backdrop::Backdrop;
 use iro::{lch_to_hex, Base24Style};
-use leptos::leptos_dom::logging::console_log;
 use leptos::*;
 use wasm_bindgen::prelude::*;
 
