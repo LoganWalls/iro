@@ -1,26 +1,29 @@
 window.addEventListener("load", async () => {
-  await window.TreeSitter.init();
+  async function setLanguage(name) {
+    // Initialize tree-sitter if needed
+    if (!window.TS.parser) {
+      await window.TreeSitter.init();
+      window.TS.parser = new window.TreeSitter();
+    }
 
-  async function setLanguage(language) {
-    const grammar = await window.TreeSitter.Language.load(
-      `tree-sitter-languages/${language}/grammar.wasm`,
+    // Load the language parser & queries
+    const language = await window.TreeSitter.Language.load(
+      `tree-sitter-languages/${name}/grammar.wasm`,
     );
     const response = await fetch(
-      `tree-sitter-languages/${language}/highlights.scm`,
+      `tree-sitter-languages/${name}/highlights.scm`,
     );
     const highlightQueries = await response.text();
-    await window.TS.parser.setLanguage(grammar);
-    window.TS.activeGrammar = grammar;
-    window.TS.query = grammar.query(highlightQueries);
+    await window.TS.parser.setLanguage(language);
+    window.TS.activeLanguage = language;
+    window.TS.query = language.query(highlightQueries);
   }
 
   // Highlighting code adapted from https://adrian.schoenig.me/blog/2022/05/27/tree-sitter-highlighting-in-jekyll/
-  function highlight(el) {
-    const code = el.innerText;
+  function highlight(code) {
     const tree = window.TS.parser.parse(code);
     var adjusted = "";
     var lastEnd = 0;
-
     TS.query.matches(tree.rootNode).forEach((match) => {
       const className = match.captures[0].name.replaceAll(".", "-");
       const text = match.captures[0].node.text;
@@ -41,16 +44,14 @@ window.addEventListener("load", async () => {
     if (lastEnd < code.length) {
       adjusted += code.substring(lastEnd);
     }
-    el.innerHTML = adjusted;
+    return adjusted;
   }
 
   window.TS = {
-    parser: new window.TreeSitter(),
-    activeGrammar: null,
+    parser: null,
+    activeLanguage: null,
     query: null,
     setLanguage,
     highlight,
   };
-
-  await TS.setLanguage("rust");
 });

@@ -5,36 +5,10 @@ mkdir -p .emscriptencache
 EM_CACHE=$(pwd)/.emscriptencache
 export EM_CACHE
 
-declare -a languages=(
-  "bash"
-  "c"
-  "c-sharp"
-  "clojure"
-  "cpp"
-  "css"
-  "elixir"
-  "go"
-  "html"
-  "java"
-  "javascript"
-  "json"
-  "lua"
-  "markdown"
-  "nix"
-  "ocaml"
-  "python"
-  "rust"
-  "scala"
-  "sql"
-  "tsx"
-  "typescript"
-  "zig"
-)
-
-# NOTE: $TS_GRAMMARS is a directory that contains all of the source
-# code for the grammars. These are provided by nix, and the env
-# variable is set in `flake.nix`
-for lang in "${languages[@]}"; do
+while IFS="" read -r lang || [ -n "$lang" ]; do
+  # NOTE: $TS_GRAMMARS is a directory that contains all of the source
+  # code for the grammars. These are provided by nix, and the env
+  # variable is set in `flake.nix`
   dir="$TS_GRAMMARS/tree-sitter-${lang}"
   if [ "$lang" = "tsx" ]; then
     dir="$TS_GRAMMARS/tree-sitter-typescript"
@@ -68,7 +42,7 @@ for lang in "${languages[@]}"; do
     fi
     rm -rf "$src"
   fi
-done
+done < "../languages.csv"
 
 rm -rf "$EM_CACHE"
 rm -f ./a.*

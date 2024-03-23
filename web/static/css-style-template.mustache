@@ -58,6 +58,29 @@ input[type=range]::-webkit-slider-thumb {
   margin-top: -6px;
 }
 
+select {
+  border-color: transparent;
+  border-width: 2px;
+  background-color: transparent;
+  color: #{{base05-hex}};
+}
+
+select:hover {
+  border-color: #{{base08-hex}};
+  cursor: pointer;
+}
+
+select:focus {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+div.code-controls {
+  border: 1px solid #{{base02-hex}};
+  background-color: #{{base02-hex}};
+}
+
 .switch {
   position: relative;
   width: 3.7em;
