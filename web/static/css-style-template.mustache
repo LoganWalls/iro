@@ -76,6 +76,29 @@ select:focus {
   box-shadow: none;
 }
 
+div.code-input {
+  caret-color: #{{base05-hex}};
+}
+
+/* Hack until Firefox implements contenteditable="plaintext-only" */
+div.code-input * {
+  width: unset !important;
+  height: unset !important;
+  overflow: unset !important;
+  padding: 0 !important;
+  display: inline !important;
+}
+
+::selection {
+  color: #{{base05-hex}};
+  background: #{{base02-hex}};
+}
+
+::-moz-selection { 
+  color: #{{base05-hex}};
+  background: #{{base02-hex}};
+}
+
 div.code-controls {
   border: 1px solid #{{base02-hex}};
   background-color: #{{base02-hex}};
