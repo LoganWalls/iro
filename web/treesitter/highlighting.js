@@ -2,23 +2,24 @@ window.addEventListener("load", async () => {
   async function setLanguage(name) {
     // Initialize tree-sitter if needed
     if (!window.TS.parser) {
-      await window.TreeSitter.init({
-        locateFile(scriptName) {
-          return `${document.baseURI}/${scriptName}`;
-        },
-      });
+      await window.TreeSitter.init();
+      console.log("Intialized");
       window.TS.parser = new window.TreeSitter();
+      console.log("Parser created");
     }
 
     // Load the language parser & queries
     const language = await window.TreeSitter.Language.load(
-      `tree-sitter-languages/${name}/grammar.wasm`,
+      `${document.baseURI}tree-sitter-languages/${name}/grammar.wasm`,
     );
+    console.log("Language loaded");
     const response = await fetch(
-      `tree-sitter-languages/${name}/highlights.scm`,
+      `${document.baseURI}tree-sitter-languages/${name}/highlights.scm`,
     );
+    console.log("Queries loaded");
     const highlightQueries = await response.text();
     await window.TS.parser.setLanguage(language);
+    console.log("Language set");
     window.TS.activeLanguage = language;
     window.TS.query = language.query(highlightQueries);
   }
