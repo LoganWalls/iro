@@ -2,7 +2,11 @@ window.addEventListener("load", async () => {
   async function setLanguage(name) {
     // Initialize tree-sitter if needed
     if (!window.TS.parser) {
-      await window.TreeSitter.init();
+      await window.TreeSitter.init({
+        locateFile(scriptName) {
+          return `${document.baseURI}/${scriptName}`;
+        },
+      });
       window.TS.parser = new window.TreeSitter();
     }
 
