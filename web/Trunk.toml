@@ -1,13 +1,11 @@
 [build]
 target = "./index.html"
 dist = "./dist"
-public_url = "/iro/"
 
 [serve]
 address = "127.0.0.1"
 port = 1420
 open = true
-public_url = "/iro/"
 
 [tools]
 tailwindcss = "3.4.1"
