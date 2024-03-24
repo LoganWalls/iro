@@ -6,7 +6,7 @@ public_url = "/iro/"
 [serve]
 address = "127.0.0.1"
 port = 1420
-open = false
+open = true
 public_url = "/iro/"
 
 [tools]
