@@ -7,11 +7,9 @@ async function setLanguage(name) {
 
   // Load the language parser & queries
   const language = await window.TreeSitter.Language.load(
-    `${document.baseURI}treesitter/${name}/grammar.wasm`,
+    `treesitter/${name}/grammar.wasm`,
   );
-  const response = await fetch(
-    `${document.baseURI}treesitter/${name}/highlights.scm`,
-  );
+  const response = await fetch(`treesitter/${name}/highlights.scm`);
   const highlightQueries = await response.text();
   await window.TS.parser.setLanguage(language);
   window.TS.activeLanguage = language;
