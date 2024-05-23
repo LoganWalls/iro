@@ -71,14 +71,12 @@ impl From<Args> for ParseColorsSettings {
 pub fn main() -> Result<()> {
     let args = Args::try_parse()?;
     let mut img = image::open(&args.path)?.into_rgb8();
-    let colors = generate_palette(
-        parse_colors(&mut img, &args.clone().into()),
-        &args.clone().into(),
-    )?;
+    let settings = args.clone().into();
+    let colors = generate_palette(parse_colors(&mut img, &args.clone().into()), &settings)?;
     let style = Base24Style {
-        name: "Bebop".to_string(),
-        author: "".to_string(),
-        variant: "dark".to_string(),
+        name: "Iro Theme".to_string(),
+        author: "You".to_string(),
+        variant: settings.style.to_string(),
         palette: colors,
     };
     println!("{}", serde_yaml::to_string(&style)?);

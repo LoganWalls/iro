@@ -4,6 +4,7 @@ use palette::Oklch;
 use serde::ser::SerializeMap;
 use serde::{Serialize, Serializer};
 
+use std::fmt::Display;
 use std::mem::MaybeUninit;
 use std::{array, iter};
 
@@ -60,6 +61,19 @@ pub enum PaletteStyle {
 impl Default for PaletteStyle {
     fn default() -> Self {
         Self::Dark
+    }
+}
+
+impl Display for PaletteStyle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Dark => "dark",
+                Self::Light => "light",
+            }
+        )
     }
 }
 

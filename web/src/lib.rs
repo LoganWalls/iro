@@ -44,7 +44,7 @@ fn style_from_colors(
     Ok(Base24Style {
         name: "Test Style".to_string(),
         author: "".to_string(),
-        variant: "dark".to_string(),
+        variant: palette_settings.style.to_string(),
         palette,
     })
 }
