@@ -8,7 +8,7 @@ codegen-units = 1
 lto = true
 
 [dependencies]
-leptos = { features = ["csr", "nightly"] }
+leptos = { version = "0.6.9", features = ["csr", "nightly"] }
 console_log = "1"
 log = "0.4"
 console_error_panic_hook = "0.1.7"
@@ -17,7 +17,13 @@ base64 = "0.21.7"
 serde_yaml = "0.9.32"
 image = "0.24.9"
 anyhow = "1.0.80"
-web-sys = { version = "0.3.68", features = ["HtmlInputElement", "FileList", "File", "Navigator", "Clipboard"] }
+web-sys = { version = "0.3.68", features = [
+  "HtmlInputElement",
+  "FileList",
+  "File",
+  "Navigator",
+  "Clipboard",
+] }
 wasm-bindgen-futures = "0.4.41"
 
 [dev-dependencies]
